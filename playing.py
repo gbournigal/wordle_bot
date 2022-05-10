@@ -8,28 +8,109 @@ Created on Mon May  9 15:51:45 2022
 
 import string
 import time
+from collections import Counter
 
 valid_words = []
+valid_solutions = []
 
 with open('words\wordle-words.txt', "r") as f:
     for line in f:
         valid_words.extend(line.split())
         
 
-letter_position = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
+with open('words\wordle-solutions.txt', "r") as f:
+    for line in f:
+        valid_solutions.extend(line.split())
+        
+valid_letters = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
 
-letter_position['a'].remove(0)
+        
+class WordleGame():
+    def __init__(self, valid_words, valid_solutions):
+        valid_letters = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
+        self.round = 0
+        self.valid_words = valid_words
+        self.left_words = valid_solutions
+        self.must_letters = []
+        self.valid_letters = valid_letters
+        self.colors = {}
+        self.tries = {}
+        self.must_letters = []
+        self.green_letters = []
+        self.black_letters = []
+        
+    
+    def delete_unvalid_words(self):
+        words_to_delete = []
+        for i in self.left_words:
+            for k in range(5):
+                if k not in self.valid_letters[i[k]]:
+                    words_to_delete.append(i)
+                    break
+         
+        if any(self.must_letters):
+            for i in self.left_words:
+                if all(letter not in self.must_letters for letter in i):
+                    words_to_delete.append(i)
 
-words_to_delete = []
+        
+        self.words_to_delete = words_to_delete
+        self.left_words = list(set(self.left_words) - set(words_to_delete))
+        
+    
+    def try_word(self, secret_word, guess, must_letters = []):
+        for i in range(5):
+            if guess[i] == secret_word[i]:
+                self.colors[i] = 'green'
+                for j in self.valid_letters.keys():
+                    if j != guess[i]:
+                        try:
+                            self.valid_letters[j].remove(i)
+                        except Exception:
+                            pass
+                            # print(f'La {j} ya se eliminó de la posición {i}')
+                self.must_letters.append(guess[i])
+                self.green_letters.append(guess[i])
+                
+            elif guess[i] in secret_word:
+                self.colors[i] = 'yellow'
+                try:
+                    self.valid_letters[guess[i]].remove(i)
+                except Exception:
+                    pass
+                    # print(f'La {guess[i]} ya se eliminó de la posición {i}')
+                self.must_letters.append(guess[i])
+            else:
+                self.colors[i] = 'black'
+                self.valid_letters[guess[i]] = []
+                self.black_letters.append(guess[i])
+                
+        self.delete_unvalid_words()
+        self.round += 1
+    
+    
+    def word_selector(self):
+        counts = Counter(letter for word in wordle.left_words for letter in word)
+        for i in self.green_letters:
+            del counts[i]
+        words_values = {}
+        for i in self.valid_words:
+            value = 0
+            for j in set(i):
+                value += counts[j]
+            words_values[i] = value
+        
+        if len(self.left_words) == 1:
+            self.selected_word = self.left_words[0]
+        else:
+            self.selected_word = max(words_values, key=words_values.get)
+        
 
-start = time.time()
-for i in valid_words:
-    for k in range(5):
-        if k not in letter_position[i[k]]:
-            words_to_delete.append(i)
-            break
-            
-new_valid_words = list(set(valid_words) - set(words_to_delete))
-end = time.time()
+wordle = WordleGame(valid_words, valid_solutions)
 
-print(end - start)
+wordle.word_selector()
+wordle.selected_word
+
+
+wordle.try_word('paint', 'apian')
+
