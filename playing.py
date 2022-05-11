@@ -90,7 +90,7 @@ class WordleGame():
     
     
     def word_selector(self):
-        counts = Counter(letter for word in wordle.left_words for letter in word)
+        counts = Counter(letter for word in self.left_words for letter in word)
         for i in self.green_letters:
             del counts[i]
         words_values = {}
@@ -104,13 +104,18 @@ class WordleGame():
             self.selected_word = self.left_words[0]
         else:
             self.selected_word = max(words_values, key=words_values.get)
+        print(self.selected_word)
+        return self.selected_word
         
 
 wordle = WordleGame(valid_words, valid_solutions)
 
-wordle.word_selector()
-wordle.selected_word
 
 
-wordle.try_word('paint', 'apian')
+word = wordle.word_selector()
+
+
+
+wordle.try_word('cigar', word)
+len(wordle.left_words)
 
