@@ -31,7 +31,6 @@ class WordleGame():
         self.round = 0
         self.valid_words = valid_words
         self.left_words = valid_solutions
-        self.must_letters = []
         self.valid_letters = valid_letters
         self.colors = {}
         self.tries = {}
