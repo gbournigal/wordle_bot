@@ -85,17 +85,16 @@ class WordleGame():
     
 class WordleBot():
     def __init__(self):
-        self.valid_words = None
+        valid_letters = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
         self.left_words = None
         self.must_letters = []
+        self.valid_letters = valid_letters
         self.green_letters = []
-        self.black_letters = []
         self.wordle = None
         
     
     def get_wordle_game(self, wordle):
         self.wordle = wordle
-        self.valid_words = wordle.valid_words
         self.left_words = wordle.valid_solutions
         
         
@@ -103,9 +102,52 @@ class WordleBot():
         pass
     
     
-    def update_left_words(self):
-        pass
-    
+    def update_left_words(self, guess, copy=False):
+        wordle_cp = self.wordle
+        valid_letters_cp = self.valid_letters
+        must_letters_cp = self.must_letters
+        green_letters_cp = self.green_letters
+        
+        for i in wordle_cp.tries.keys():
+            for j in range(len(wordle_cp.tries[i])):
+                if wordle_cp.colors[i][j] == 'green':
+                    for j in valid_letters_cp.keys():
+                        if j != guess[i]:
+                            try:
+                                valid_letters_cp[j].remove(i)
+                            except Exception:
+                                pass
+                    must_letters_cp.append(guess[i])
+                    green_letters_cp.append(guess[i])
+                        
+                elif wordle_cp.colors[i][j] == 'yellow':
+                    try:
+                        valid_letters_cp[guess[i]].remove(i)
+                    except Exception:
+                        pass
+                        # print(f'La {guess[i]} ya se eliminó de la posición {i}')
+                    must_letters_cp.append(guess[i])
+                
+                elif wordle_cp.colors[i][j] == 'black':
+                    valid_letters_cp[guess[i]] = []
+            
+            
+            words_to_delete = []
+            for i in self.left_words:
+                for k in range(5):
+                    if k not in self.valid_letters[i[k]]:
+                        words_to_delete.append(i)
+                        break
+             
+            if any(self.must_letters):
+                for i in self.left_words:
+                    if all(letter not in self.must_letters for letter in i):
+                        words_to_delete.append(i)
+
+            
+            self.words_to_delete = words_to_delete
+            self.left_words = list(set(self.left_words) - set(words_to_delete))
+                    
     
     def word_selector(self):
         pass
