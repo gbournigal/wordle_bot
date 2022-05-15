@@ -7,7 +7,6 @@ Created on Tue May 10 15:20:57 2022
 
 
 import string
-import time
 from collections import Counter
 
 valid_words = []
@@ -99,67 +98,97 @@ class WordleBot():
         
         
     def solve_wordle(self):
-        pass
+        if self.wordle.round != 0:
+            self.update_left_words()
+            
+        
+        while self.wordle.status != 'end':
+            guess = self.word_selector()
+            self.update_left_words(guess=guess, copy=False)
+            
     
-    
-    def update_left_words(self, guess, copy=False):
+    def update_left_words(self, guess=None, copy=True):
         wordle_cp = self.wordle
         valid_letters_cp = self.valid_letters
         must_letters_cp = self.must_letters
         green_letters_cp = self.green_letters
-        
+             
+        if guess == None:
+            pass
+        else:
+            wordle_cp.try_word(guess)
+            
         for i in wordle_cp.tries.keys():
             for j in range(len(wordle_cp.tries[i])):
                 if wordle_cp.colors[i][j] == 'green':
-                    for j in valid_letters_cp.keys():
-                        if j != guess[i]:
+                    for k in valid_letters_cp.keys():
+                        if k !=  wordle_cp.tries[i][j]:
                             try:
-                                valid_letters_cp[j].remove(i)
+                                valid_letters_cp[k].remove(j)
                             except Exception:
                                 pass
-                    must_letters_cp.append(guess[i])
-                    green_letters_cp.append(guess[i])
+                    must_letters_cp.append(wordle_cp.tries[i][j])
+                    green_letters_cp.append(wordle_cp.tries[i][j])
                         
                 elif wordle_cp.colors[i][j] == 'yellow':
                     try:
-                        valid_letters_cp[guess[i]].remove(i)
+                        valid_letters_cp[wordle_cp.tries[i][j]].remove(j)
                     except Exception:
                         pass
-                        # print(f'La {guess[i]} ya se eliminó de la posición {i}')
-                    must_letters_cp.append(guess[i])
+
+                    must_letters_cp.append(wordle_cp.tries[i][j])
                 
                 elif wordle_cp.colors[i][j] == 'black':
-                    valid_letters_cp[guess[i]] = []
+                    valid_letters_cp[wordle_cp.tries[i][j]] = []           
             
             
             words_to_delete = []
             for i in self.left_words:
                 for k in range(5):
-                    if k not in self.valid_letters[i[k]]:
+                    if k not in valid_letters_cp[i[k]]:
                         words_to_delete.append(i)
                         break
              
-            if any(self.must_letters):
+            if any(must_letters_cp):
                 for i in self.left_words:
-                    if all(letter not in self.must_letters for letter in i):
+                    if all(letter not in must_letters_cp for letter in i):
                         words_to_delete.append(i)
 
             
-            self.words_to_delete = words_to_delete
-            self.left_words = list(set(self.left_words) - set(words_to_delete))
-                    
-    
-    def word_selector(self):
-        pass
-        
-    
+            left_words = list(set(self.left_words) - set(words_to_delete))
             
+        if copy and guess is not None:
+            return left_words
         
-    
-wordle = WordleGame(valid_words, valid_solutions)
-
-wordle.define_secret('hello')
-
-wordle.try_word('hello')
-
-wordle.colors
+        elif copy == False:
+            self.left_words = left_words
+            self.wordle = wordle_cp
+            self.valid_letters = valid_letters_cp
+            self.must_letters = must_letters_cp
+            self.green_letters = green_letters_cp
+                     
+        elif guess == None:
+            self.left_words = left_words
+            self.wordle = wordle_cp
+            self.valid_letters = valid_letters_cp
+            self.must_letters = must_letters_cp
+            self.green_letters = green_letters_cp
+                
+                
+    def word_selector(self):
+        counts = Counter(letter for word in self.left_words for letter in word)
+        for i in self.green_letters:
+            del counts[i]
+        words_values = {}
+        for i in self.wordle.valid_words:
+            value = 0
+            for j in set(i):
+                value += counts[j]
+            words_values[i] = value
+        
+        if len(self.left_words) <= 2 or self.wordle.round == 6:
+            self.selected_word = self.left_words[0]
+        else:
+            self.selected_word = max(words_values, key=words_values.get)
+        print(self.selected_word)
+        return self.selected_word
