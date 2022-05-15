@@ -17,7 +17,7 @@ if 'wordle' not in st.session_state:
 
     
 st.session_state['wordle'] = WordleGame(valid_words, valid_solutions) 
-secret_word = st.text_input('Define the secret word for the Bot', value='hello', max_chars=5)
+secret_word = str.lower(st.text_input('Define the secret word for the Bot', value='hello', max_chars=5))
 if secret_word not in valid_solutions:
     st.write('The word is not valid, try again.')
 else:
