@@ -16,15 +16,14 @@ valid_solutions = []
 
 with urllib.request.urlopen('https://raw.githubusercontent.com/gbournigal/wordle_bot/main/words/wordle-solutions.txt') as f:
     for line in f:
-        valid_solutions.extend(line.split())
+        valid_solutions.extend(line.decode("utf-8").split())
         
 
 with urllib.request.urlopen('https://raw.githubusercontent.com/gbournigal/wordle_bot/main/words/wordle-words.txt') as f:
     for line in f:
-        valid_words.extend(line.split())
+        valid_words.extend(line.decode("utf-8").split())
         
 valid_letters = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
-
 
  
 class WordleGame():
