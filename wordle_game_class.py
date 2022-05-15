@@ -14,12 +14,12 @@ valid_words = []
 valid_solutions = []
 
 
-with urllib.request.urlopen('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-solutions.txt') as f:
+with urllib.request.urlopen('https://raw.githubusercontent.com/gbournigal/wordle_bot/main/words/wordle-solutions.txt') as f:
     for line in f:
         valid_solutions.extend(line.split())
         
 
-with urllib.request.urlopen('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-words.txt') as f:
+with urllib.request.urlopen('https://raw.githubusercontent.com/gbournigal/wordle_bot/main/words/wordle-words.txt') as f:
     for line in f:
         valid_words.extend(line.split())
         
