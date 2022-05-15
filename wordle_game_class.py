@@ -12,12 +12,12 @@ from collections import Counter
 valid_words = []
 valid_solutions = []
 
-with open('words\wordle-words.txt', "r") as f:
+with open('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-solutions.txt', "r") as f:
     for line in f:
         valid_words.extend(line.split())
         
 
-with open('words\wordle-solutions.txt', "r") as f:
+with open('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-solutions.txt', "r") as f:
     for line in f:
         valid_solutions.extend(line.split())
         
