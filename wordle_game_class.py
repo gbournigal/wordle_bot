@@ -8,18 +8,19 @@ Created on Tue May 10 15:20:57 2022
 
 import string
 from collections import Counter
+import urllib.request
 
 valid_words = []
 valid_solutions = []
 
-with open('words\wordle-words.txt', "r") as f:
-    for line in f:
-        valid_words.extend(line.split())
-        
-
-with open('words\wordle-solutions.txt', "r") as f:
+with urllib.request.urlopen('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-solutions.txt') as f:
     for line in f:
         valid_solutions.extend(line.split())
+        
+
+with urllib.request.urlopen('https://github.com/gbournigal/wordle_bot/blob/main/words/wordle-words.txt') as f:
+    for line in f:
+        valid_words.extend(line.split())
         
 valid_letters = {i: [0, 1, 2, 3, 4] for i in string.ascii_lowercase}
 
